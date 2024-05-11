@@ -11,7 +11,7 @@ Socket client =  server.AcceptSocket(); // wait for client
 
 Console.WriteLine("Connection Established");
 
-byte[] request_text?;
+byte[]? request_text = null;
 client.Receive(request_text);
 
 Console.WriteLine(request_text);
