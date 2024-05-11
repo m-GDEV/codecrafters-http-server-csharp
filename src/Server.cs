@@ -11,6 +11,11 @@ Socket client =  server.AcceptSocket(); // wait for client
 
 Console.WriteLine("Connection Established");
 
+byte[] request_text?;
+client.Receive(request_text);
+
+Console.WriteLine(request_text);
+
 
 string return_string = "HTTP/1.1 200 OK\r\n\r\n";
 byte[] return_array = System.Text.Encoding.ASCII.GetBytes(return_string);
