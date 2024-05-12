@@ -50,6 +50,8 @@ public class Functions {
         compressor.Write(data, 0, data.Length);
         compressor.Close();
 
+        Console.WriteLine(compressedBody.ToArray());
+
         return Encoding.UTF8.GetString(compressedBody.ToArray());
     }
 
