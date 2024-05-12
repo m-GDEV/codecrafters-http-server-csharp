@@ -150,6 +150,12 @@ public class Functions {
             else if (header.ToLower().StartsWith("accept-encoding:")){
                 requestHeaders.Encoding = getEncoding(header);
             }
+            else if (header.ToLower().StartsWith("content-length:")) {
+                // nothing
+            }
+            else if (header.ToLower().StartsWith("host:")) {
+                // nothing
+            }
 
             // Catch all at the end since it should be the body by now. If its not i'm missing a header to check for above
             else {
