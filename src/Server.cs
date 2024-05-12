@@ -31,7 +31,7 @@ while (true) {
     Console.WriteLine("Connection Established");
 
     // Create response buffer and get resonse
-    byte[] requestText = new byte[1000];
+    byte[] requestText = new byte[100];
     client.Receive(requestText);
 
     // Parse request path
