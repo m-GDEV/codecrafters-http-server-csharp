@@ -45,7 +45,7 @@ while (true) {
         client.Send(generatedReturnByteArray("200 OK", "text/plain", words[2]));
     }
     else {
-        client.Send(generatedReturnByteArray("404 Not Found", "text/plain", "Nothing Dipshit"));
+        client.Send(generatedReturnByteArray("200 OK", "text/plain", "Nothing Dipshit"));
     }
 
     client.Close();
