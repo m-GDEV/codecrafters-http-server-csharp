@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.IO;
 
 byte[] generateResponse(string status, string contentType, string responseBody) {
     // Status Line
@@ -15,6 +16,23 @@ byte[] generateResponse(string status, string contentType, string responseBody) 
     response += responseBody;
 
     return Encoding.UTF8.GetBytes(response);
+}
+
+string readFile(string filepath) {
+    // Handling exceptions "higher" up
+    string fileContents = "";
+
+    // Read file using stream
+    StreamReader fp = new StreamReader(filepath);
+    var line = fp.ReadLine();
+
+    while (line != null) {
+        fileContents += line;
+        line = fp.ReadLine();
+    }
+    fp.Close();
+
+    return fileContents;
 }
 
 
@@ -46,21 +64,40 @@ while (true) {
     if (path.Equals("/")) {
         client.Send(generateResponse("200 OK", "text/plain", "Nothing"));
     }
+
+    // Return if file specified after '/files/' exists, return contents in resonse body
+    else if (path.StartsWith("/files/")) {
+        // Instructions mention the program WILL be run like this ./program --directory dir
+        string directoryName = args[1];
+        string filename = path.Split("/")[2];
+
+        try {
+            string fileContents = readFile(directoryName + filename);
+            client.Send(generateResponse("200 OK", "application/octet-stream", fileContents));
+        }
+        catch (Exception e){
+            client.Send(generateResponse("404 Not Found", "text/plain", "File Not Found"));
+        }
+    }
+
+    // Return User-Agent in resonse body
     else if (path.Equals("/user-agent")) {
         string userAgent = parsedLines[2].Split(" ")[1];
         client.Send(generateResponse("200 OK", "text/plain", userAgent));
     }
+
+    // Return text after '/echo/' in resonse body
     else if (path.StartsWith("/echo")) {
-        string[] words = path.Split("/");
-        client.Send(generateResponse("200 OK", "text/plain", words[2]));
+        string word = path.Split("/")[2];
+        client.Send(generateResponse("200 OK", "text/plain", word));
     }
+
+    // You're a loser
     else {
         client.Send(generateResponse("404 Not Found", "text/plain", "Nothing Dipshit"));
     }
 
     client.Close();
-
 }
-
 
 server.Stop();
