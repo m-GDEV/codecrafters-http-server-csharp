@@ -36,15 +36,11 @@ while (true) {
 
     // Parse request path
     string parsed = System.Text.Encoding.UTF8.GetString(requestText);
-
     string[] parsedLines = parsed.Split("\r\n");
-    // Console.WriteLine(parsed);
 
     // Capturing specific parts of the request that will always be there
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-
-    // Console.WriteLine($"agent is: {userAgent}");
 
     // Logic
     if (path.Equals("/")) {
