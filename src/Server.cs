@@ -35,8 +35,7 @@ while (true) {
     client.Receive(requestText);
 
     // Parse request path
-    // string parsed = System.Text.Encoding.UTF8.GetString(requestText);
-    string parsed = "GET /echo/banana HTTP/1.1\r\nHost: localhost:4221\r\n\r\n";
+    string parsed = System.Text.Encoding.UTF8.GetString(requestText);
 
     string[] parsedLines = parsed.Split("\r\n");
     // Console.WriteLine(parsed);
