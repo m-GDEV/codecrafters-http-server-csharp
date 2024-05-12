@@ -179,7 +179,7 @@ public class Functions {
     }
     public static string getEncoding(string headerString) {
         foreach (var encoding in headerString.Split(" ")) {
-            if (encoding.Equals("gzip")) {
+            if (encoding.Equals("gzip,")) {
                 return "gzip";
             }
         }
