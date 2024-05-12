@@ -35,16 +35,15 @@ while (true) {
     client.Receive(requestText);
 
     // Parse request path
-    string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    // string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    string parsed = "GET /echo/banana HTTP/1.1\r\nHost: localhost:4221\r\n\r\n";
 
     string[] parsedLines = parsed.Split("\r\n");
     // Console.WriteLine(parsed);
 
-    // Capturing specific parts of the request
+    // Capturing specific parts of the request that will always be there
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-
-    string userAgent = parsedLines[2].Split(" ")[1];
 
     // Console.WriteLine($"agent is: {userAgent}");
 
@@ -53,6 +52,7 @@ while (true) {
         client.Send(generateResponse("200 OK", "text/plain", "Nothing"));
     }
     else if (path.Equals("/user-agent")) {
+        string userAgent = parsedLines[2].Split(" ")[1];
         client.Send(generateResponse("200 OK", "text/plain", userAgent));
     }
     else if (path.StartsWith("/echo")) {
