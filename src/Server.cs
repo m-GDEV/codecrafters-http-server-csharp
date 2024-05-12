@@ -40,17 +40,20 @@ while (true) {
 
     Console.WriteLine($"Path is: {path}");
 
-    if (path.StartsWith("/echo")) {
-        string[] words = path.Split("/");
-        client.Send(generatedReturnByteArray("200 OK", "text/plain", words[2]));
-    }
-    else {
-        client.Send(generatedReturnByteArray("200 OK", "text/plain", "Nothing Dipshit"));
-    }
+    if (path.Equals("/")) {
+        client.Send(generatedReturnByteArray("200 OK", "text/plain", "Nothing");
+                }
+                else if (path.StartsWith("/echo")) {
+                string[] words = path.Split("/");
+                client.Send(generatedReturnByteArray("200 OK", "text/plain", words[2]));
+                }
+                else {
+                client.Send(generatedReturnByteArray("404 Not Found", "text/plain", "Nothing Dipshit"));
+                }
 
-    client.Close();
+                client.Close();
 
-}
+                }
 
 
-server.Stop();
+                server.Stop();
