@@ -92,7 +92,7 @@ public class Functions {
         else if (requestHeaders.Path.StartsWith("/echo")) {
             string word = requestHeaders.Path.Split("/")[2];
 
-            if (requestHeaders.Encoding != null && requestHeaders.Encoding.Equals("gzip")) {
+            if (requestHeaders.Encoding != null && requestHeaders.Encoding != "" && requestHeaders.Encoding.Equals("gzip")) {
                 return generateResponse("200 OK", "text/plain", "", "gzip");
             }
             return generateResponse("200 OK", "text/plain", word);
@@ -178,7 +178,13 @@ public class Functions {
         return headerString.Split(" ") [1];
     }
     public static string getEncoding(string headerString) {
-        return headerString.Split(" ") [1];
+        foreach (var encoding in headerString.Split(" ")) {
+            if (encoding.Equals("gzip")) {
+                return "gzip";
+            }
+        }
+
+        return "";
     }
 
 }
