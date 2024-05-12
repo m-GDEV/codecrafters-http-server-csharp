@@ -5,7 +5,6 @@ using System.Text;
 byte[] generatedReturnByteArray(string status, string contentType, string responseBody) {
     // Status Line
     string response = $"HTTP/1.1 {status}\r\n";
-    response += "\r\n";
 
     // Headers
     response += $"Content-Type: {contentType}\r\n";
@@ -43,7 +42,7 @@ while (true) {
 
     if (path.StartsWith("/echo")) {
         string[] words = path.Split("/");
-        client.Send(generatedReturnByteArray("200 OK", "text/plain", words[1]));
+        client.Send(generatedReturnByteArray("200 OK", "text/plain", words[2]));
     }
     else {
         client.Send(generatedReturnByteArray("404 Not Found", "text/plain", "Nothing Dipshit"));
