@@ -11,15 +11,28 @@ Socket client =  server.AcceptSocket(); // wait for client
 
 Console.WriteLine("Connection Established");
 
-byte[]? request_text = null;
+byte[] request_text = new byte[100];
 client.Receive(request_text);
 
-Console.WriteLine(request_text);
+string parsed = System.Text.Encoding.UTF8.GetString(request_text);
+string[] parsed_lines = parsed.Split("\r\n");
+string[] path_words = parsed_lines[0].Split(" ");
+string path = path_words[1];
 
+Console.WriteLine($"Path is: {path}");
 
-string return_string = "HTTP/1.1 200 OK\r\n\r\n";
-byte[] return_array = System.Text.Encoding.ASCII.GetBytes(return_string);
+if (String.Equals("/", path)) {
+    string return_string = "HTTP/1.1 200 OK\r\n\r\n";
+    byte[] return_array = System.Text.Encoding.ASCII.GetBytes(return_string);
 
-client.Send(return_array);
+    client.Send(return_array);
+}
+else {
+    string return_string = "HTTP/1.1 404 Not Found\r\n\r\n";
+    byte[] return_array = System.Text.Encoding.ASCII.GetBytes(return_string);
+
+    client.Send(return_array);
+}
+
 
 server.Stop();
