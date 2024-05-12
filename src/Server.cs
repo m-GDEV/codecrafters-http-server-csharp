@@ -93,7 +93,7 @@ byte[] handleGET(string[] parsedLines) {
 byte[] handlePOST(string[] parsedLines) {
     // Setup stuff
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-    string body = parsedLines[7];
+    string body = parsedLines[4];
 
     // Branching logic
     if (path.Equals("/")) {
@@ -137,7 +137,7 @@ while (true) {
     Socket client =  server.AcceptSocket();
     Console.WriteLine("Connection Established");
 
-    // Create response buffer and get resonse
+    // Create response buffer and get resonse (lol idk how to dynamically handle this)
     byte[] requestText = new byte[1000];
     client.Receive(requestText);
 
