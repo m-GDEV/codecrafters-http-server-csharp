@@ -57,8 +57,9 @@ void writeFile(string filepath, string fileContents) {
 byte[] handleGET(string[] parsedLines) {
     // Setup stuff
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-    string userAgent = parsedLines[2].Split(" ")[1];
-    string encoding = parsedLines[3].Split(" ")[1];
+                                                // string userAgent = parsedLines[2].Split(" ")[1];
+    string userAgent = "dick";
+    string encoding = parsedLines[2].Split(" ")[1];
 
     // Branching logic
     if (path.Equals("/")) {
@@ -90,7 +91,7 @@ byte[] handleGET(string[] parsedLines) {
         string word = path.Split("/")[2];
 
         if (encoding == "gzip") {
-            return generateResponse("200 OK", "text/plain", word, "gzip");
+            return generateResponse("200 OK", "text/plain", "", "gzip");
         }
         return generateResponse("200 OK", "text/plain", word);
     }
@@ -149,7 +150,7 @@ while (true) {
 
     // Parse request path
     string parsed = System.Text.Encoding.UTF8.GetString(requestText);
-    // Console.WriteLine(parsed);
+    Console.WriteLine(parsed);
     string[] parsedLines = parsed.Split("\r\n");
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
 
