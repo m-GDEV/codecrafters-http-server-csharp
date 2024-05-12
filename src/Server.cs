@@ -1,132 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.IO;
 
-// -----------------------------------------
-// Random helper functions
-// -----------------------------------------
-byte[] generateResponse(string status, string contentType, string responseBody, string? encoding = null) {
-    // Status Line
-    string response = $"HTTP/1.1 {status}\r\n";
-
-    // Headers
-    response += $"Content-Type: {contentType}\r\n";
-    response += $"Content-Length: {responseBody.Length}\r\n";
-    response += "\r\n";
-
-    // Content Encoding
-    if (encoding != null) {
-        response += $"Content-Encoding: {encoding}";
-    }
-
-    // Response Body
-    response += responseBody;
-
-    return Encoding.UTF8.GetBytes(response);
-}
-
-string readFile(string filepath) {
-    // Handling exceptions "higher" up
-    string fileContents = "";
-
-    // Read file using stream
-    StreamReader fp = new StreamReader(filepath);
-    var line = fp.ReadLine();
-
-    while (line != null) {
-        fileContents += line;
-        line = fp.ReadLine();
-    }
-    fp.Close();
-
-    return fileContents;
-}
-
-void writeFile(string filepath, string fileContents) {
-    StreamWriter fp = new StreamWriter(filepath);
-
-    // We need to remove the trailing null terminator. I didn't think this would be an issue in C# lol
-    fp.Write(fileContents.Replace("\0", string.Empty));
-    fp.Close();
-}
-
-// -----------------------------------------
-// Methods to handle different HTPP methods
-// -----------------------------------------
-byte[] handleGET(string[] parsedLines) {
-    // Setup stuff
-    string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-                                                // string userAgent = parsedLines[2].Split(" ")[1];
-    string userAgent = "dick";
-    string encoding = parsedLines[2].Split(" ")[1];
-
-    // Branching logic
-    if (path.Equals("/")) {
-        return generateResponse("200 OK", "text/plain", "Nothing");
-    }
-
-    // Return if file specified after '/files/' exists, return contents in resonse body
-    else if (path.StartsWith("/files/")) {
-        // Instructions mention the program WILL be run like this ./program --directory dir
-        string directoryName = args[1];
-        string filename = path.Split("/")[2];
-
-        try {
-            string fileContents = readFile(directoryName + filename);
-            return generateResponse("200 OK", "application/octet-stream", fileContents);
-        }
-        catch (Exception){
-            return generateResponse("404 Not Found", "text/plain", "File Not Found");
-        }
-    }
-
-    // Return User-Agent in resonse body
-    else if (path.Equals("/user-agent")) {
-        return generateResponse("200 OK", "text/plain", userAgent);
-    }
-
-    // Return text after '/echo/' in resonse body
-    else if (path.StartsWith("/echo")) {
-        string word = path.Split("/")[2];
-
-        if (encoding == "gzip") {
-            return generateResponse("200 OK", "text/plain", "", "gzip");
-        }
-        return generateResponse("200 OK", "text/plain", word);
-    }
-
-    // You're a loser
-    else {
-        return generateResponse("404 Not Found", "text/plain", "Nothing Dipshit");
-    }
-}
-
-byte[] handlePOST(string[] parsedLines) {
-    // Setup stuff
-    string path = parsedLines[0].Split(" ")[1]; // /echo/apple
-    string body = parsedLines[4];
-
-    // Return if file specified after '/files/' exists, return contents in resonse body
-    if (path.StartsWith("/files/")) {
-        // Instructions mention the program WILL be run like this ./program --directory dir
-        string directoryName = args[1];
-        string filename = path.Split("/")[2];
-
-        try {
-            writeFile(directoryName + filename, body);
-            return generateResponse("201 Created", "text/plain", "Nothing");
-        }
-        catch (Exception){
-            return generateResponse("404 Not Found", "text/plain", "Can't Write File");
-        }
-    }
-
-    // You're a loser
-    else {
-        return generateResponse("404 Not Found", "text/plain", "Nothing Dipshit");
-    }
-}
+using Helper;
+using Types;
 
 // -----------------------------------------
 // Main Code
@@ -150,20 +26,35 @@ while (true) {
 
     // Parse request path
     string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    Headers requestHeaders = Functions.processHeaders(parsed);
+
+    string directoryName = "";
+    if (args.Length >= 2 && args[0] == "--directory") {
+        directoryName = args[1];
+    }
+
     Console.WriteLine(parsed);
-    string[] parsedLines = parsed.Split("\r\n");
-    string method = parsedLines[0].Split(" ")[0]; // GET, POST
+    Console.WriteLine(requestHeaders);
 
     // Logic
-    switch (method) {
+    switch (requestHeaders.Method) {
         case "GET":
-            client.Send(handleGET(parsedLines));
+            // Instructions mention the program WILL be run like this ./program --directory dir
+            client.Send(Functions.handleGET(requestHeaders, directoryName));
             break;
         case "POST":
-            client.Send(handlePOST(parsedLines));
+            // Instructions mention the program WILL be run like this ./program --directory dir
+            client.Send(Functions.handlePOST(requestHeaders, directoryName));
             break;
     }
 
     client.Close();
 }
 // server.Stop();
+
+
+
+
+// OK SO YOU NEED TO FIGURE OUT HOW TO PARSE THE HEADERS PROPERLY, NOT BASED ON THEIR POSITION LOL
+// i'm thinking, write a function that processes the 'parsed' variable and return a struct including
+// the parsed header values
