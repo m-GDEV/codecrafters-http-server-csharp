@@ -42,7 +42,7 @@ void writeFile(string filepath, string fileContents) {
     StreamWriter fp = new StreamWriter(filepath);
 
     // We need to remove the trailing null terminator. I didn't think this would be an issue in C# lol
-    fp.WriteLine(fileContents.Replace("\0", string.Empty));
+    fp.Write(fileContents.Replace("\0", string.Empty));
     fp.Close();
 }
 
