@@ -35,7 +35,9 @@ while (true) {
     client.Receive(requestText);
 
     // Parse request path
-    string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    // string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    string parsed = "GET /user-agent HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: grape/strawberry\r\n\r\n";
+
     string[] parsedLines = parsed.Split("\r\n");
     // Console.WriteLine(parsed);
 
@@ -43,9 +45,9 @@ while (true) {
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
 
-    string userAgent = parsedLines[3].Split(" ")[1];
+    string userAgent = parsedLines[2].Split(" ")[1];
 
-    // Console.WriteLine($"Path is: {path}");
+    // Console.WriteLine($"agent is: {userAgent}");
 
     // Logic
     if (path.Equals("/")) {
