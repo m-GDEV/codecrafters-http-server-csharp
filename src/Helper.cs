@@ -18,7 +18,7 @@ public class Functions {
 
         // Content Encoding
         if (encoding != null) {
-            response += $"Content-Encoding: {encoding}";
+            response += $"Content-Encoding: {encoding}\r\n";
         }
 
         response += "\r\n";
