@@ -1,4 +1,5 @@
 using System.Text;
+using System.IO.Compression;
 using Types;
 
 namespace Helper;
@@ -16,16 +17,40 @@ public class Functions {
         response += $"Content-Type: {contentType}\r\n";
         response += $"Content-Length: {responseBody.Length}\r\n";
 
-        // Content Encoding
+        // Content Encoding and compression
         if (encoding != null) {
             response += $"Content-Encoding: {encoding}\r\n";
+            response += "\r\n";
+
+            response += Compress(responseBody);
+
+            Console.WriteLine($"compressed: {Compress(responseBody)}");
+
+
+        }
+        // No compression
+        else {
+            response += "\r\n";
+            response += responseBody;
         }
 
-        response += "\r\n";
-
-        // Response Body
-        response += responseBody;
         return Encoding.UTF8.GetBytes(response);
+    }
+
+
+    /*
+       Given a string, compress it using gzip and return that in string form
+       */
+    public static string Compress(string info) {
+        // Compressing the body
+        byte[] data = Encoding.UTF8.GetBytes(info);
+
+        MemoryStream compressedBody = new MemoryStream();
+        GZipStream compressor = new GZipStream(compressedBody, CompressionMode.Compress);
+        compressor.Write(data, 0, data.Length);
+        compressor.Close();
+
+        return Encoding.UTF8.GetString(compressedBody.ToArray());
     }
 
 
