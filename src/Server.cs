@@ -3,6 +3,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
+// -----------------------------------------
+// Random helper functions
+// -----------------------------------------
 byte[] generateResponse(string status, string contentType, string responseBody) {
     // Status Line
     string response = $"HTTP/1.1 {status}\r\n";
@@ -35,6 +38,92 @@ string readFile(string filepath) {
     return fileContents;
 }
 
+void writeFile(string filepath, string fileContents) {
+    StreamWriter fp = new StreamWriter(filepath);
+
+    fp.WriteLine(fileContents);
+    fp.Close();
+}
+
+// -----------------------------------------
+// Methods to handle different HTPP methods
+// -----------------------------------------
+byte[] handleGET(string[] parsedLines) {
+    // Setup stuff
+    string path = parsedLines[0].Split(" ")[1]; // /echo/apple
+
+    // Branching logic
+    if (path.Equals("/")) {
+        return generateResponse("200 OK", "text/plain", "Nothing");
+    }
+
+    // Return if file specified after '/files/' exists, return contents in resonse body
+    else if (path.StartsWith("/files/")) {
+        // Instructions mention the program WILL be run like this ./program --directory dir
+        string directoryName = args[1];
+        string filename = path.Split("/")[2];
+
+        try {
+            string fileContents = readFile(directoryName + filename);
+            return generateResponse("200 OK", "application/octet-stream", fileContents);
+        }
+        catch (Exception e){
+            return generateResponse("404 Not Found", "text/plain", "File Not Found");
+        }
+    }
+
+    // Return User-Agent in resonse body
+    else if (path.Equals("/user-agent")) {
+        string userAgent = parsedLines[2].Split(" ")[1];
+        return generateResponse("200 OK", "text/plain", userAgent);
+    }
+
+    // Return text after '/echo/' in resonse body
+    else if (path.StartsWith("/echo")) {
+        string word = path.Split("/")[2];
+        return generateResponse("200 OK", "text/plain", word);
+    }
+
+    // You're a loser
+    else {
+        return generateResponse("404 Not Found", "text/plain", "Nothing Dipshit");
+    }
+}
+
+byte[] handlePOST(string[] parsedLines) {
+    // Setup stuff
+    string path = parsedLines[0].Split(" ")[1]; // /echo/apple
+    string body = parsedLines[7];
+
+    // Branching logic
+    if (path.Equals("/")) {
+        return generateResponse("200 OK", "text/plain", "Nothing");
+    }
+
+    // Return if file specified after '/files/' exists, return contents in resonse body
+    else if (path.StartsWith("/files/")) {
+        // Instructions mention the program WILL be run like this ./program --directory dir
+        string directoryName = args[1];
+        string filename = path.Split("/")[2];
+
+        try {
+            writeFile(directoryName + filename, body);
+            return generateResponse("201 Created", "text/plain", "Nothing");
+        }
+        catch (Exception e){
+            return generateResponse("404 Not Found", "text/plain", "File Not Found");
+        }
+    }
+
+    // You're a loser
+    else {
+        return generateResponse("404 Not Found", "text/plain", "Nothing Dipshit");
+    }
+}
+
+// -----------------------------------------
+// Main Code
+// -----------------------------------------
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 Console.WriteLine("Logs from your program will appear here!");
@@ -49,55 +138,24 @@ while (true) {
     Console.WriteLine("Connection Established");
 
     // Create response buffer and get resonse
-    byte[] requestText = new byte[100];
+    byte[] requestText = new byte[1000];
     client.Receive(requestText);
 
     // Parse request path
     string parsed = System.Text.Encoding.UTF8.GetString(requestText);
     string[] parsedLines = parsed.Split("\r\n");
-
-    // Capturing specific parts of the request that will always be there
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
-    string path = parsedLines[0].Split(" ")[1]; // /echo/apple
 
     // Logic
-    if (path.Equals("/")) {
-        client.Send(generateResponse("200 OK", "text/plain", "Nothing"));
-    }
-
-    // Return if file specified after '/files/' exists, return contents in resonse body
-    else if (path.StartsWith("/files/")) {
-        // Instructions mention the program WILL be run like this ./program --directory dir
-        string directoryName = args[1];
-        string filename = path.Split("/")[2];
-
-        try {
-            string fileContents = readFile(directoryName + filename);
-            client.Send(generateResponse("200 OK", "application/octet-stream", fileContents));
-        }
-        catch (Exception e){
-            client.Send(generateResponse("404 Not Found", "text/plain", "File Not Found"));
-        }
-    }
-
-    // Return User-Agent in resonse body
-    else if (path.Equals("/user-agent")) {
-        string userAgent = parsedLines[2].Split(" ")[1];
-        client.Send(generateResponse("200 OK", "text/plain", userAgent));
-    }
-
-    // Return text after '/echo/' in resonse body
-    else if (path.StartsWith("/echo")) {
-        string word = path.Split("/")[2];
-        client.Send(generateResponse("200 OK", "text/plain", word));
-    }
-
-    // You're a loser
-    else {
-        client.Send(generateResponse("404 Not Found", "text/plain", "Nothing Dipshit"));
+    switch (method) {
+        case "GET":
+            client.Send(handleGET(parsedLines));
+            break;
+        case "POST":
+            client.Send(handlePOST(parsedLines));
+            break;
     }
 
     client.Close();
 }
-
 server.Stop();
