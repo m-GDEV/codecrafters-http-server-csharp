@@ -41,7 +41,8 @@ string readFile(string filepath) {
 void writeFile(string filepath, string fileContents) {
     StreamWriter fp = new StreamWriter(filepath);
 
-    fp.WriteLine(fileContents);
+    // We need to remove the trailing null terminator. I didn't think this would be an issue in C# lol
+    fp.WriteLine(fileContents.Replace("\0", string.Empty));
     fp.Close();
 }
 
@@ -67,7 +68,7 @@ byte[] handleGET(string[] parsedLines) {
             string fileContents = readFile(directoryName + filename);
             return generateResponse("200 OK", "application/octet-stream", fileContents);
         }
-        catch (Exception e){
+        catch (Exception){
             return generateResponse("404 Not Found", "text/plain", "File Not Found");
         }
     }
@@ -110,7 +111,7 @@ byte[] handlePOST(string[] parsedLines) {
             writeFile(directoryName + filename, body);
             return generateResponse("201 Created", "text/plain", "Nothing");
         }
-        catch (Exception e){
+        catch (Exception){
             return generateResponse("404 Not Found", "text/plain", "File Not Found");
         }
     }
@@ -158,4 +159,4 @@ while (true) {
 
     client.Close();
 }
-server.Stop();
+// server.Stop();
