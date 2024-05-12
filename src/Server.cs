@@ -35,8 +35,7 @@ while (true) {
     client.Receive(requestText);
 
     // Parse request path
-    // string parsed = System.Text.Encoding.UTF8.GetString(requestText);
-    string parsed = "GET /user-agent HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: grape/strawberry\r\n\r\n";
+    string parsed = System.Text.Encoding.UTF8.GetString(requestText);
 
     string[] parsedLines = parsed.Split("\r\n");
     // Console.WriteLine(parsed);
