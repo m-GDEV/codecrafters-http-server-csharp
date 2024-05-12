@@ -22,22 +22,22 @@ public class Functions {
             response += $"Content-Encoding: {encoding}\r\n";
             response += "\r\n";
 
-            response += Compress(responseBody);
+            byte[] byteResponse = Encoding.UTF8.GetBytes(response);
+            return byteResponse.Concat(Compress(responseBody)).ToArray();
         }
         // No compression
         else {
             response += "\r\n";
             response += responseBody;
+            return Encoding.UTF8.GetBytes(response);
         }
-
-        return Encoding.UTF8.GetBytes(response);
     }
 
 
     /*
-       Given a string, compress it using gzip and return that in string form
+       Given a string, compress it using gzip and return the hex string of the resulting byte array
        */
-    public static string Compress(string info) {
+    public static byte[] Compress(string info) {
         // Compressing the body
         byte[] data = Encoding.UTF8.GetBytes(info);
 
@@ -46,7 +46,19 @@ public class Functions {
         compressor.Write(data, 0, data.Length);
         compressor.Close();
 
-        return Convert.ToHexString(compressedBody.ToArray());
+        return compressedBody.ToArray();
+    }
+
+    /*
+       Given a hex string, decompress it using gzip and return the original stirngoriginal stirngoriginal stirngoriginal stirng
+       */
+    public static string Decompress(byte[] data) {
+        MemoryStream compressedStream = new MemoryStream(data);
+        GZipStream decompressor = new GZipStream(compressedStream, CompressionMode.Decompress);
+        MemoryStream resultStream = new MemoryStream();
+        decompressor.CopyTo(resultStream);
+
+        return Encoding.UTF8.GetString(resultStream.ToArray());
     }
 
 
