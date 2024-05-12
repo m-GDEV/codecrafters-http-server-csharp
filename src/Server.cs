@@ -6,7 +6,7 @@ using System.IO;
 // -----------------------------------------
 // Random helper functions
 // -----------------------------------------
-byte[] generateResponse(string status, string contentType, string responseBody) {
+byte[] generateResponse(string status, string contentType, string responseBody, string? encoding = null) {
     // Status Line
     string response = $"HTTP/1.1 {status}\r\n";
 
@@ -14,6 +14,11 @@ byte[] generateResponse(string status, string contentType, string responseBody) 
     response += $"Content-Type: {contentType}\r\n";
     response += $"Content-Length: {responseBody.Length}\r\n";
     response += "\r\n";
+
+    // Content Encoding
+    if (encoding != null) {
+        response += $"Content-Encoding: {encoding}";
+    }
 
     // Response Body
     response += responseBody;
@@ -52,6 +57,8 @@ void writeFile(string filepath, string fileContents) {
 byte[] handleGET(string[] parsedLines) {
     // Setup stuff
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
+    string userAgent = parsedLines[2].Split(" ")[1];
+    string encoding = parsedLines[3].Split(" ")[1];
 
     // Branching logic
     if (path.Equals("/")) {
@@ -75,13 +82,16 @@ byte[] handleGET(string[] parsedLines) {
 
     // Return User-Agent in resonse body
     else if (path.Equals("/user-agent")) {
-        string userAgent = parsedLines[2].Split(" ")[1];
         return generateResponse("200 OK", "text/plain", userAgent);
     }
 
     // Return text after '/echo/' in resonse body
     else if (path.StartsWith("/echo")) {
         string word = path.Split("/")[2];
+
+        if (encoding == "gzip") {
+            return generateResponse("200 OK", "text/plain", word, "gzip");
+        }
         return generateResponse("200 OK", "text/plain", word);
     }
 
@@ -96,13 +106,8 @@ byte[] handlePOST(string[] parsedLines) {
     string path = parsedLines[0].Split(" ")[1]; // /echo/apple
     string body = parsedLines[4];
 
-    // Branching logic
-    if (path.Equals("/")) {
-        return generateResponse("200 OK", "text/plain", "Nothing");
-    }
-
     // Return if file specified after '/files/' exists, return contents in resonse body
-    else if (path.StartsWith("/files/")) {
+    if (path.StartsWith("/files/")) {
         // Instructions mention the program WILL be run like this ./program --directory dir
         string directoryName = args[1];
         string filename = path.Split("/")[2];
@@ -112,7 +117,7 @@ byte[] handlePOST(string[] parsedLines) {
             return generateResponse("201 Created", "text/plain", "Nothing");
         }
         catch (Exception){
-            return generateResponse("404 Not Found", "text/plain", "File Not Found");
+            return generateResponse("404 Not Found", "text/plain", "Can't Write File");
         }
     }
 
@@ -144,6 +149,7 @@ while (true) {
 
     // Parse request path
     string parsed = System.Text.Encoding.UTF8.GetString(requestText);
+    // Console.WriteLine(parsed);
     string[] parsedLines = parsed.Split("\r\n");
     string method = parsedLines[0].Split(" ")[0]; // GET, POST
 
