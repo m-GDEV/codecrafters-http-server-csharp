@@ -22,15 +22,16 @@ public class Functions {
             response += $"Content-Encoding: {encoding}\r\n";
             response += "\r\n";
 
-            byte[] byteResponse = Encoding.UTF8.GetBytes(response);
-            return byteResponse.Concat(Compress(responseBody)).ToArray();
+            // byte[] byteResponse = Encoding.UTF8.GetBytes(response);
+            byte[] compressed = Compress(responseBody);
+            response += Encoding.UTF8.GetString(compressed);
         }
         // No compression
         else {
             response += "\r\n";
             response += responseBody;
-            return Encoding.UTF8.GetBytes(response);
         }
+        return Encoding.UTF8.GetBytes(response);
     }
 
 
@@ -44,7 +45,7 @@ public class Functions {
         MemoryStream compressedBody = new MemoryStream();
         GZipStream compressor = new GZipStream(compressedBody, CompressionMode.Compress);
         compressor.Write(data, 0, data.Length);
-        compressor.Close();
+        compressor.Flush();
 
         return compressedBody.ToArray();
     }
