@@ -22,10 +22,14 @@ public class Functions {
             response += $"Content-Encoding: {encoding}\r\n";
             response += "\r\n";
 
-            // byte[] byteResponse = Encoding.UTF8.GetBytes(response);
             byte[] compressed = Compress(responseBody);
-            response += Encoding.UTF8.GetString(compressed);
-            // response += "\r\n";
+            var resByte = Encoding.UTF8.GetBytes(response);
+            var total = new byte[resByte.Length + compressed.Length];
+
+            Array.Copy(resByte, total, resByte.Length);
+            Array.Copy(compressed, total, compressed.Length);
+
+            return total;
         }
         // No compression
         else {

@@ -9,10 +9,7 @@ using Types;
 // -----------------------------------------
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
-// Console.WriteLine("Logs from your program will appear here!");
-
-Console.WriteLine(System.Text.Encoding.UTF8.GetString(Functions.Compress("banana")));
-return;
+Console.WriteLine("Logs from your program will appear here!");
 
 // Create TcpListener
 TcpListener server = new TcpListener(IPAddress.Any, 4221);
