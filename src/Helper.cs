@@ -25,7 +25,7 @@ public class Functions {
             // byte[] byteResponse = Encoding.UTF8.GetBytes(response);
             byte[] compressed = Compress(responseBody);
             response += Encoding.UTF8.GetString(compressed);
-            response += "\r\n";
+            // response += "\r\n";
         }
         // No compression
         else {
