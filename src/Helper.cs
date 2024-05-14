@@ -26,8 +26,9 @@ public class Functions {
             var resByte = Encoding.UTF8.GetBytes(response);
             var total = new byte[resByte.Length + compressed.Length];
 
-            Array.Copy(resByte, total, resByte.Length);
             Array.Copy(compressed, total, compressed.Length);
+            Array.Copy(resByte, total, resByte.Length);
+            Console.Write(System.Text.Encoding.UTF8.GetString(compressed));
 
             return total;
         }
