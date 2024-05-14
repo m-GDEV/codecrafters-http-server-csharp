@@ -10,20 +10,23 @@ public class Functions {
        Generate the byte array that is the HTTP response of the server
        */
     public static byte[] generateResponse(string status, string contentType, string responseBody, string? encoding = null) {
-        byte[] compressed = Compress(responseBody);
-        // Status Line
-        string response = $"HTTP/1.1 {status}\r\n";
 
-        // Headers
-        response += $"Content-Type: {contentType}\r\n";
-        response += $"Content-Length: {compressed.Length}\r\n";
+        Response httpResponse = new Response();
+
+        // Status
+        httpResponse.Status = $"HTTP/1.1 {status}\r\n";
+
+        // Header
+        httpResponse.ContentType =  $"Content-Type: {contentType}\r\n";
+        httpResponse.ContentLength = $"Content-Length: {responseBody.Length}\r\n";
 
         // Content Encoding and compression
         if (encoding != null) {
-            response += $"Content-Encoding: {encoding}\r\n";
-            response += "\r\n";
+            byte[] compressed = Compress(responseBody);
+            httpResponse.ContentLength = $"Content-Length: {compressed.Length}\r\n";
+            httpResponse.ContentEncoding = $"Content-Encoding: {encoding}\r\n";
 
-            var resByte = Encoding.UTF8.GetBytes(response);
+            var resByte = Encoding.UTF8.GetBytes(httpResponse.ToString());
             var total = new byte[resByte.Length + compressed.Length];
 
             Array.Copy(resByte, 0,total, 0, resByte.Length);
@@ -31,12 +34,9 @@ public class Functions {
 
             return total;
         }
+
         // No compression
-        else {
-            response += "\r\n";
-            response += responseBody;
-        }
-        return Encoding.UTF8.GetBytes(response);
+        return Encoding.UTF8.GetBytes(httpResponse.ToString() + responseBody);
     }
 
 

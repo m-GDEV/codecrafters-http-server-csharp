@@ -10,19 +10,6 @@ using Types;
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 Console.WriteLine("Logs from your program will appear here!");
-//
-// foreach (var bit in Functions.Compress("banana")) {
-//     Console.Write(bit);
-// }
-// var d = Functions.Compress("banana");
-//
-//
-// using (FileStream fs = new FileStream("./test.gz", FileMode.Create))
-// {
-// fs.Write(d, 0, d.Length);
-// }
-// Console.Write(System.Text.Encoding.UTF8.GetString(d));
-// return;
 
 // Create TcpListener
 TcpListener server = new TcpListener(IPAddress.Any, 4221);

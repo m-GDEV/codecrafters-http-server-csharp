@@ -13,3 +13,15 @@ public struct Headers {
         return $"Method: {Method}, Path: {Path}, UserAgent: {UserAgent}, Encoding: {Encoding}, Body: {Body}";
     }
 }
+
+public struct Response {
+    public string Status { get; set; }
+    public string ContentType { get; set; }
+    public string ContentLength { get;set; }
+    public string ContentEncoding { get;set; }
+
+    public override string ToString() {
+        // Status, headers, newline, body
+        return $"{Status}{ContentType}{ContentLength}{ContentEncoding}\r\n";
+    }
+}
