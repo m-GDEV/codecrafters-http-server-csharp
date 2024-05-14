@@ -10,19 +10,19 @@ public class Functions {
        Generate the byte array that is the HTTP response of the server
        */
     public static byte[] generateResponse(string status, string contentType, string responseBody, string? encoding = null) {
+        byte[] compressed = Compress(responseBody);
         // Status Line
         string response = $"HTTP/1.1 {status}\r\n";
 
         // Headers
         response += $"Content-Type: {contentType}\r\n";
-        response += $"Content-Length: {responseBody.Length}\r\n";
+        response += $"Content-Length: {compressed.Length}\r\n";
 
         // Content Encoding and compression
         if (encoding != null) {
             response += $"Content-Encoding: {encoding}\r\n";
             response += "\r\n";
 
-            byte[] compressed = Compress(responseBody);
             var resByte = Encoding.UTF8.GetBytes(response);
             var total = new byte[resByte.Length + compressed.Length];
 
