@@ -46,7 +46,7 @@ public class Functions {
     public static byte[] Compress(string info) {
         // Compressing the body
         byte[] data = Encoding.UTF8.GetBytes(info);
-
+        Console.WriteLine($"word to compress: {info}");
         MemoryStream compressedBody = new MemoryStream();
         GZipStream compressor = new GZipStream(compressedBody, CompressionMode.Compress);
         compressor.Write(data, 0, data.Length);
@@ -133,7 +133,7 @@ public class Functions {
             string word = requestHeaders.Path.Split("/")[2];
 
             if (requestHeaders.Encoding != null && requestHeaders.Encoding != "" && requestHeaders.Encoding.Equals("gzip")) {
-                return generateResponse("200 OK", "text/plain", "", "gzip");
+                return generateResponse("200 OK", "text/plain", word, "gzip");
             }
             return generateResponse("200 OK", "text/plain", word);
         }
