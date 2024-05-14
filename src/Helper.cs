@@ -51,6 +51,7 @@ public class Functions {
         GZipStream compressor = new GZipStream(compressedBody, CompressionMode.Compress);
         compressor.Write(data, 0, data.Length);
         compressor.Flush();
+        compressor.Close();
 
         return compressedBody.ToArray();
     }
